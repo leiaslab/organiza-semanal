@@ -30,6 +30,8 @@ type SpendingItem = {
 const THEME_STORAGE_KEY = "organiza-home-theme";
 const FOOD_STORAGE_KEY = "organiza-home-foods";
 const SPENDING_STORAGE_KEY = "organiza-home-spending";
+const APP_VERSION_STORAGE_KEY = "organiza-app-version";
+const CURRENT_APP_VERSION = "2026-03-31-brand-refresh";
 
 function readStorageValue(key: string) {
   if (typeof window === "undefined") {
@@ -186,6 +188,35 @@ export function AppShell() {
     limpieza: { name: "", price: "", quantity: "" },
     "cuidado-personal": { name: "", price: "", quantity: "" },
   });
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const savedVersion = readStorageValue(APP_VERSION_STORAGE_KEY);
+    if (savedVersion === CURRENT_APP_VERSION) {
+      return;
+    }
+
+    writeStorageValue(APP_VERSION_STORAGE_KEY, CURRENT_APP_VERSION);
+
+    const refreshApp = async () => {
+      if ("serviceWorker" in navigator) {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(registrations.map((registration) => registration.unregister()));
+      }
+
+      if ("caches" in window) {
+        const cacheKeys = await window.caches.keys();
+        await Promise.all(cacheKeys.map((key) => window.caches.delete(key)));
+      }
+
+      window.location.reload();
+    };
+
+    void refreshApp();
+  }, []);
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
