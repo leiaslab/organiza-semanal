@@ -6,11 +6,6 @@ import { AppStateProvider } from "@/context/app-state-context";
 export const metadata: Metadata = {
   title: "Organiza+",
   description: "App personal de organizacion, habitos y control semanal",
-  icons: {
-    icon: "/favicon-organiza.png",
-    shortcut: "/favicon-organiza.png",
-    apple: "/foto.png.jpeg",
-  },
   appleWebApp: {
     capable: true,
     title: "Organiza+",
