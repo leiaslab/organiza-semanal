@@ -740,7 +740,7 @@ export function AppShell() {
           </div>
 
           <div className="hero-title-wrap">
-            <h1 className="hero-title">Organizacion comidas y gastos semanal</h1>
+            <h1 className="hero-title">ORGANIZA+</h1>
           </div>
         </section>
 
