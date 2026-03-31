@@ -1,5 +1,6 @@
 "use client";
 
+import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import { startTransition, useEffect, useState } from "react";
 import { currency } from "@/lib/utils";
@@ -157,6 +158,20 @@ const dayColorStyles = [
   { backgroundColor: "#ffe3dc", color: "#a34a38", borderColor: "#fdba74" },
   { backgroundColor: "#ffe3f1", color: "#a23a72", borderColor: "#f9a8d4" },
 ];
+
+const screenMotion = {
+  initial: { opacity: 0, y: 18, scale: 0.985 },
+  animate: { opacity: 1, y: 0, scale: 1 },
+  exit: { opacity: 0, y: -10, scale: 0.99 },
+  transition: { duration: 0.28, ease: [0.22, 1, 0.36, 1] },
+} as const;
+
+const drawerMotion = {
+  initial: { opacity: 0, y: -10, scale: 0.98 },
+  animate: { opacity: 1, y: 0, scale: 1 },
+  exit: { opacity: 0, y: -8, scale: 0.98 },
+  transition: { duration: 0.22, ease: [0.22, 1, 0.36, 1] },
+} as const;
 
 export function AppShell() {
   const [activeCategory, setActiveCategory] = useState<CategoryKey>("recetas");
@@ -527,7 +542,14 @@ export function AppShell() {
     if (activeCategory === "recetas") {
       if (!activeDay) {
         return (
-          <div className="recipe-days-layout recipe-view">
+          <motion.div
+            key="recipe-days"
+            className="recipe-days-layout recipe-view"
+            initial={screenMotion.initial}
+            animate={screenMotion.animate}
+            exit={screenMotion.exit}
+            transition={screenMotion.transition}
+          >
             <div className="recipe-days-list">
               {weekDays.map((day, index) => (
                 <button
@@ -544,14 +566,21 @@ export function AppShell() {
                 </button>
               ))}
             </div>
-          </div>
+          </motion.div>
         );
       }
 
       const dayMeals = visibleWeeklyDiet[activeDay];
 
       return (
-        <div className="recipe-detail-view recipe-view">
+        <motion.div
+          key={`recipe-day-${activeDay}`}
+          className="recipe-detail-view recipe-view"
+          initial={screenMotion.initial}
+          animate={screenMotion.animate}
+          exit={screenMotion.exit}
+          transition={screenMotion.transition}
+        >
           <div className="recipe-detail-header">
             <button
               type="button"
@@ -611,7 +640,7 @@ export function AppShell() {
               </article>
             ))}
           </div>
-        </div>
+        </motion.div>
       );
     }
 
@@ -794,8 +823,15 @@ export function AppShell() {
             </button>
           </div>
 
-          {isMobileMenuOpen ? (
-            <div className="mt-3 rounded-[28px] border border-[var(--border)] bg-[var(--surface)] p-3 shadow-[0_18px_40px_rgba(31,37,44,0.1)] backdrop-blur-xl">
+          <AnimatePresence initial={false}>
+            {isMobileMenuOpen ? (
+              <motion.div
+                className="mt-3 rounded-[28px] border border-[var(--border)] bg-[var(--surface)] p-3 shadow-[0_18px_40px_rgba(31,37,44,0.1)] backdrop-blur-xl"
+                initial={drawerMotion.initial}
+                animate={drawerMotion.animate}
+                exit={drawerMotion.exit}
+                transition={drawerMotion.transition}
+              >
               <div className="grid gap-2">
                 {categories.map((category) => {
                   const isActive = category.key === activeCategory;
@@ -823,8 +859,9 @@ export function AppShell() {
                   );
                 })}
               </div>
-            </div>
-          ) : null}
+              </motion.div>
+            ) : null}
+          </AnimatePresence>
         </section>
 
         <section className="category-menu hidden md:flex" aria-label="Categorias principales">
@@ -861,9 +898,18 @@ export function AppShell() {
           <div className="content-badge">Categoria activa</div>
           <h2 className="content-title">{currentCategory.label}</h2>
           <p className="content-description">{currentCategory.description}</p>
-          <div key={`${activeCategory}-${activeDay ?? "lista"}`} className="screen-transition">
-            {renderContent()}
-          </div>
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={`${activeCategory}-${activeDay ?? "lista"}`}
+              className="screen-transition"
+              initial={screenMotion.initial}
+              animate={screenMotion.animate}
+              exit={screenMotion.exit}
+              transition={screenMotion.transition}
+            >
+              {renderContent()}
+            </motion.div>
+          </AnimatePresence>
         </section>
 
         <button
