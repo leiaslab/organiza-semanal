@@ -216,6 +216,16 @@ export function AppShell() {
   }, []);
 
   useEffect(() => {
+    if (typeof window === "undefined" || !("serviceWorker" in navigator)) {
+      return;
+    }
+
+    navigator.serviceWorker.register("/sw.js").catch(() => {
+      // If registration fails, the app still works online.
+    });
+  }, []);
+
+  useEffect(() => {
     writeStorageValue(FOOD_STORAGE_KEY, JSON.stringify(foodItems));
   }, [foodItems]);
 
